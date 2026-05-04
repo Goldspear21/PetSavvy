@@ -1,8 +1,3 @@
-Bhargav Suresh - 412002531  
-Jason Venkataraghavan - 757001356  
-Loretta Denis - 764002677  
-Afnan Hasan - 412002840
-
 ```
                 __
                /\/'-,
@@ -10,4 +5,11 @@ Afnan Hasan - 412002840
  ____,'.  )       \___
 '"""""------'"""`-----'
 ```
-Petsavvy is useful to the center for managing important data about the animals and their customers (mainly their contacts and other personal details and any booking/walk in appointments), as well as helping in their promotion and brand image by being visually appealing and easy to use/absorb information from. It would provide any information that any potential customers would want about them and their animals, and how it would benefit them to choose this center for their pet/assistive animal needs. 
+
+**The Motif**  
+This is a passion project developed with the aim of giving animals a chance at finding loving homes where they may be appreciated for simply existing as we believe that is enough reason to do so. Our goal is to combine the act of finding your ideal cuddle partner, with browsing for essentials needed for said partner! To accomplish this goal, we aim to develop a online shop to purchase items like treats, and toys, to enable customers to have the best experience as brand new, or returning owners. 
+
+The project uses the Spring framework for its backend and JPA Repository to connect an SQL database storing relevant information. The frontend utilizes JavaScript with CSS to efficiently create responsive design. 
+
+This whole project is subject to change and there is much development currently ongoing which will be implemented in the near future. 
+
