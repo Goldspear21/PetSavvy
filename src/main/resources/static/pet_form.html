@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pet Form - PetSavvy</title>
+    <style>
+        :root {
+            --accent: #E5E4E2;
+            --dark: #111;
+            --border: 2px solid #111;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 60px 20px;
+            color: var(--dark);
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border: var(--border);
+            padding: 40px;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.05);
+        }
+
+        /* Home link styling */
+        .home-link {
+            display: block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .home-link:hover {
+            color: #777;
+        }
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #666;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            padding: 12px;
+            border: var(--border);
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        input:focus, select:focus {
+            background-color: #fffdf5;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--dark);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: var(--border);
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.2s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-success {
+            background: var(--dark);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #333;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="/" class="home-link">← HOME</a>
+    <h1 id="title">Add Pet</h1>
+
+    <form id="petForm">
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="petName" required placeholder="Enter pet name">
+        </div>
+
+        <div class="form-group">
+            <label>Birthdate</label>
+            <input type="date" id="petBirthdate" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" id="petPrice" step="0.01" required placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+                <label>Type</label>
+                <input type="text" id="petType" required placeholder="e.g. Dog, Cat">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            <select id="petStatus" required>
+                <option value="available">Available</option>
+                <option value="sold">Sold</option>
+                <option value="adopted">Adopted</option>
+                <option value="reserved">Reserved</option>
+            </select>
+        </div>
+
+        <label class="checkbox-container">
+            <input type="checkbox" id="petVaccinated">
+            <span>Vaccinated</span>
+        </label>
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-success">Save Record</button>
+            <a href="pet_table.html" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const petID = params.get('id');
+
+    async function loadPet() {
+        if (petID) {
+            document.getElementById('title').textContent = 'Edit Pet';
+            const response = await fetch(`/api/pets/${petID}`);
+            const pet = await response.json();
+            document.getElementById('petName').value = pet.petName;
+            document.getElementById('petBirthdate').value = pet.petBirthdate;
+            document.getElementById('petPrice').value = pet.petPrice;
+            document.getElementById('petType').value = pet.petType;
+            document.getElementById('petStatus').value = pet.petStatus;
+            document.getElementById('petVaccinated').checked = pet.petVaccinated;
+        }
+    }
+
+    document.getElementById('petForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const pet = {
+            petName: document.getElementById('petName').value,
+            petBirthdate: document.getElementById('petBirthdate').value,
+            petPrice: document.getElementById('petPrice').value,
+            petType: document.getElementById('petType').value,
+            petStatus: document.getElementById('petStatus').value,
+            petVaccinated: document.getElementById('petVaccinated').checked
+        };
+
+        const url = petID ? `/api/pets/${petID}` : '/api/pets';
+        const method = petID ? 'PUT' : 'POST';
+
+        await fetch(url, {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(pet)
+        });
+
+        window.location.href = 'pet_table.html';
+    });
+
+    loadPet();
+</script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetSavvy Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            color: #111;
+        }
+
+        /* Fixed Header Styles */
+        header {
+            background-color: #E5E4E2;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1100;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(0);
+            transition: transform 0.3s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header.hide-nav {
+            transform: translateY(-100%);
+        }
+
+        /* Nav & Dropdown Logic */
+        nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul li a {
+            padding: 16px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            display: block;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #ffffff;
+            min-width: 180px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        /* Curtain Effect */
+        .video-inner {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            z-index: 999;
+            clip-path: inset(calc(var(--scroll, 0) * 1.8vh) 0 0 0);
+            transition: clip-path 0.1s linear;
+        }
+
+        .video-inner img {
+            width: 100%;
+            height: 100%;
+            filter: brightness(50%);
+            object-fit: cover;
+        }
+
+        .video-text {
+            position: absolute;
+            bottom: 320px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            text-align: center;
+            z-index: 11;
+        }
+
+        #main-content {
+            position: relative;
+            z-index: 1;
+            margin-top: 100vh;
+            background: #f9f9f9;
+            min-height: 100vh;
+        }
+
+        .container {
+            padding: 60px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Animal Rows */
+        .animal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 80px;
+            margin-top: 40px;
+        }
+
+        .animal-row {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .animal-row:nth-child(even) { flex-direction: row-reverse; }
+
+        .animal-image-side {
+            flex: 1;
+            height: 400px;
+            border: 2px solid #111;
+            overflow: hidden;
+        }
+
+        .animal-image-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .animal-text-side { flex: 1; }
+
+        footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <ul id="nav-list">
+            <li><a href="/pets">PETS</a></li>
+            <li><a href="/rescued">RESCUES</a></li>
+            <li id="login-nav-item"><a href="/login">LOGIN</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="video-inner">
+    <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1350&q=80" alt="Pet Hero">
+    <div class="video-text">
+        <h1>PetSavvy</h1>
+    </div>
+</div>
+
+<div id="main-content">
+    <div class="container">
+        <div style="text-align:center; margin-bottom: 60px;">
+            <h1>Welcome to PetSavvy!</h1>
+            <p> Your One-stop-shop to all things cute. Ever felt your heart get absolutely entangled upon one look at an adorable face of a puppy or a kitten?
+
+                Well look no further! For we have just the solution. A service focused on providing caretakers with the most enjoyable experience of raising, and bonding with a friend.
+
+            </p> <br>
+
+            <p>PetSavvy is on a mission to assist and encourage as many individuals as possible to learn about, and love animals. Though we fashion ourselves as a <b>Pet adoption center</b>,
+
+                our aim remains to realize a future that is happy for all animals. Which is why we pride ourselves in taking care of and providing homes for pets that have lost theirs, our <b>Rescues.</b> </p>
+        </div>
+
+        <div style="text-align:center; margin-top: 80px;">
+            <h1>A Glimpse Into Our Family</h1>
+        </div>
+
+        <div class="animal-list">
+            <div class="animal-row">
+                <div class="animal-image-side">
+                    <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80" alt="Golden Retriever">
+                </div>
+                <div class="animal-text-side">
+                    <p>Here is Malenia, The goodest girl! Not to say all our other girls and boys aren't good, but between you and us she's kind of the best.
+
+                        She was the first animal to be registered as a rescue at PetSavvy when she was found, so she serves as the cutest mascot ever</p>
+                </div>
+            </div>
+
+            <div class="animal-row">
+                <div class="animal-image-side">
+                    <img src="https://images.unsplash.com/photo-1548247416-ec66f4900b2e?auto=format&fit=crop&w=800&q=80" alt="Calico Cat">
+                </div>
+                <div class="animal-text-side">
+                    <p>Meet Godrick, the one-man army...of course, only when it comes to treats. He loves to eat. His hobbies range from eating in the morning,
+
+                        the afternoon, and the night. Oh, did we tell you he LOVES humans, for their food. He has been with us for one year. He was consumed all our food.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer><p>&copy; 2026 PetSavvy</p></footer>
+</div>
+
+<script>
+    let lastScroll = 0;
+    let hasScrolledPast = false;
+    const header = document.querySelector("header");
+    const videoInner = document.querySelector('.video-inner');
+
+    // Initialize scroll variable
+    videoInner.style.setProperty('--scroll', 0);
+
+    window.addEventListener("scroll", () => {
+        let currentScroll = window.pageYOffset;
+
+        if (currentScroll > 300) hasScrolledPast = true;
+
+        const scrollValue = currentScroll / 10;
+
+        if (!hasScrolledPast) {
+            videoInner.style.setProperty('--scroll', scrollValue);
+        } else {
+            const clampPoint = 2.8;
+            const stuckValue = Math.max(scrollValue, clampPoint);
+            videoInner.style.setProperty('--scroll', stuckValue);
+        }
+
+        if (hasScrolledPast) {
+            if (currentScroll < lastScroll) {
+                header.classList.remove("hide-nav");
+            } else if (currentScroll > 50) {
+                header.classList.add("hide-nav");
+            }
+        }
+        lastScroll = currentScroll;
+    });
+
+    // Auth logic
+    fetch('/api/auth/status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.loggedIn) {
+                const loginNavItem = document.getElementById('login-nav-item');
+                if (loginNavItem) loginNavItem.style.display = 'none';
+
+                const navList = document.getElementById('nav-list');
+
+                const logoutLi = document.createElement('li');
+                logoutLi.innerHTML = `<a href="/logout">LOGOUT</a>`;
+                navList.appendChild(logoutLi);
+
+                const adminLi = document.createElement('li');
+                adminLi.className = 'dropdown';
+                adminLi.innerHTML = `
+                <a href="javascript:void(0)">ADMIN OPTIONS ▼</a>
+                <div class="dropdown-content">
+                    <a href="/users">User Management</a>
+                    <a href="/customer">Customer Management</a>
+                </div>
+            `;
+                navList.appendChild(adminLi);
+            }
+        })
+        .catch(err => console.error("Auth fetch failed", err));
+</script>
+</body>
+</html>

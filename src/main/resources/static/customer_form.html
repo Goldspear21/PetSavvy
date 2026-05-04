@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Form</title>
+    <style>
+        :root {
+            --accent: #E5E4E2;
+            --dark: #111;
+            --border: 2px solid #111;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 60px 20px;
+            color: var(--dark);
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border: var(--border);
+            padding: 40px;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .name-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #666;
+            letter-spacing: 1px;
+        }
+
+        input {
+            padding: 12px;
+            border: var(--border);
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            background-color: #fffdf5;
+            border-color: #555;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: var(--border);
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.2s;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-success {
+            background: var(--dark);
+            color: white;
+        }
+
+        .btn-success:hover { background: #333; }
+
+        .btn-secondary {
+            background: white;
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover { background: #eee; }
+
+        .home-link {
+            display: block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #777;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="/" class="home-link">← Home</a>
+    <h1 id="title">Add Customer</h1>
+
+    <form id="customerForm">
+        <div class="name-row">
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="custFirstName" required placeholder="e.g. John">
+            </div>
+
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="custLastName" required placeholder="e.g. Doe">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="custEmail" required placeholder="john.doe@example.com">
+        </div>
+
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="custPhone" required placeholder="(555) 000-0000">
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-success">Save Customer</button>
+            <a href="customer_table.html" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const custNumber = params.get('id');
+
+    async function loadCustomers() {
+        if (custNumber) {
+            document.getElementById('title').textContent = 'Edit Customer';
+            const response = await fetch(`/api/customers/${custNumber}`);
+            const customer = await response.json();
+            document.getElementById('custFirstName').value = customer.custFirstName;
+            document.getElementById('custLastName').value = customer.custLastName;
+            document.getElementById('custEmail').value = customer.custEmail;
+            document.getElementById('custPhone').value = customer.custPhone;
+        }
+    }
+
+    document.getElementById('customerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const customer = {
+            custFirstName: document.getElementById('custFirstName').value,
+            custLastName: document.getElementById('custLastName').value,
+            custEmail: document.getElementById('custEmail').value,
+            custPhone: document.getElementById('custPhone').value
+        };
+
+        const url = custNumber ? `/api/customers/${custNumber}` : `/api/customers`;
+        const method = custNumber ? 'PUT' : 'POST';
+
+        await fetch(url, {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(customer)
+        });
+
+        window.location.href = 'customer_table.html';
+    });
+
+    loadCustomers();
+</script>
+</body>
+</html>

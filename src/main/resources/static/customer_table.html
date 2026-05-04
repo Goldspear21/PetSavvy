@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer database</title>
+    <style>
+        :root {
+            --accent: #E5E4E2;
+            --dark: #111;
+            --border: 2px solid #111;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 40px 20px;
+            color: var(--dark);
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* Header Styling */
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .home-link { text-decoration: none; color: var(--dark); font-weight: bold; margin-bottom: 10px; display: inline-block; }
+
+        /* Top Bar & Search */
+        .top-bar { display: flex; gap: 15px; margin-bottom: 20px; }
+        #search {
+            flex: 1;
+            padding: 12px;
+            border: var(--border);
+            font-family: inherit;
+            outline: none;
+        }
+
+        /* Sort Bar */
+        .sort-bar {
+            background: var(--accent);
+            padding: 10px;
+            border: var(--border);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            font-size: 0.8rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .sort-bar button {
+            background: white;
+            border: 1px solid var(--dark);
+            padding: 5px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+
+        .sort-bar button:hover {
+            background: var(--dark);
+            color: white;
+        }
+
+        /* Customer Record Cards */
+        #customerTableBody { display: flex; flex-direction: column; gap: 15px; }
+
+        .customer-record-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border: var(--border);
+            padding: 20px 25px;
+            transition: 0.2s;
+        }
+
+        .customer-record-row:hover {
+            background: #fffdf5;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.05);
+        }
+
+        .info-group {
+            display: grid;
+            grid-template-columns: 60px 1.2fr 1.2fr 2fr 1.5fr;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .info-item strong {
+            display: block;
+            font-size: 0.65rem;
+            color: #777;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item span {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Action Buttons */
+        .btn-primary {
+            background: var(--dark);
+            color: white;
+            border: var(--border);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .btn-warning {
+            background: #ffcc00;
+            border: 1px solid #111;
+            cursor: pointer;
+            padding: 6px 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .btn-danger {
+            background: #ff4444;
+            border: 1px solid #111;
+            color: white;
+            cursor: pointer;
+            padding: 6px 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="/" class="home-link">← HOME</a>
+
+    <div class="inventory-header">
+        <h1>CUSTOMER DATABASE</h1>
+        <a href="customer_form.html"><button class="btn-primary">ADD CUSTOMER</button></a>
+    </div>
+
+    <div class="top-bar">
+        <input type="text" id="search" placeholder="Search by name...">
+    </div>
+
+    <div class="sort-bar">
+        <strong>SORT BY:</strong>
+        <button id="sortBtnid">ID</button>
+        <button id="sortBtnFirstName">First Name</button>
+        <button id="sortBtnLastName">Last Name</button>
+        <button id="sortBtnEmail">Email</button>
+        <button id="sortBtnPhone">Phone</button>
+    </div>
+
+    <div id="customerTableBody"></div>
+</div>
+
+<script>
+    let allCustomers = [];
+    let sortState = { field: 'custNumber', ascending: true };
+
+    async function loadCustomers() {
+        const response = await fetch(`/api/customers`);
+        const customers = await response.json();
+        allCustomers = customers;
+        sortState = { field: 'custNumber', ascending: true };
+        sortAndShow(allCustomers);
+    }
+
+    async function showCustomers(customers) {
+        let html = '';
+        for (let customer of customers) {
+            html += `
+            <div class="customer-record-row">
+                <div class="info-group">
+                    <div class="info-item">
+                        <strong>ID</strong>
+                        <span>#${customer.custNumber}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>First Name</strong>
+                        <span>${customer.custFirstName}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Last Name</strong>
+                        <span>${customer.custLastName}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Email</strong>
+                        <span>${customer.custEmail}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Phone</strong>
+                        <span>${customer.custPhone}</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <a href="customer_form.html?id=${customer.custNumber}"><button class="btn-warning">Edit</button></a>
+                    <button class="btn-danger" onclick="deleteCustomer(${customer.custNumber})">Delete</button>
+                </div>
+            </div>`;
+        }
+        document.getElementById('customerTableBody').innerHTML = html;
+    }
+
+    function sortCustomers(field) {
+        if (sortState.field === field) {
+            sortState.ascending = !sortState.ascending;
+        } else {
+            sortState.field = field;
+            sortState.ascending = true;
+        }
+        sortAndShow(allCustomers);
+    }
+
+    function sortAndShow(customers) {
+        customers.sort((a, b) => {
+            let aVal = a[sortState.field];
+            let bVal = b[sortState.field];
+
+            if (typeof aVal === 'string') {
+                aVal = aVal.toLowerCase();
+                bVal = bVal.toLowerCase();
+                return sortState.ascending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            } else {
+                return sortState.ascending ? aVal - bVal : bVal - aVal;
+            }
+        });
+        showCustomers(customers);
+    }
+
+    async function deleteCustomer(id) {
+        if(confirm('Are you sure you want to delete this customer?')) {
+            await fetch(`/api/customers/${id}`, {method: 'DELETE'});
+            loadCustomers();
+        }
+    }
+
+    document.getElementById('sortBtnid').addEventListener('click', () => sortCustomers('custNumber'));
+    document.getElementById('sortBtnFirstName').addEventListener('click', () => sortCustomers('custFirstName'));
+    document.getElementById('sortBtnLastName').addEventListener('click', () => sortCustomers('custLastName'));
+    document.getElementById('sortBtnEmail').addEventListener('click', () => sortCustomers('custEmail'));
+    document.getElementById('sortBtnPhone').addEventListener('click', () => sortCustomers('custPhone'));
+
+    document.getElementById('search').addEventListener('keyup', async (e) => {
+        const response = await fetch(`/api/customers/search/name?name=${e.target.value}`);
+        const customers = await response.json();
+        allCustomers = customers;
+        sortState = { field: 'custNumber', ascending: true };
+        sortAndShow(allCustomers);
+    });
+
+    loadCustomers();
+</script>
+</body>
+</html>

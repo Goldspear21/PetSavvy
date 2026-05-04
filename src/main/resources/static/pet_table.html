@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pets</title>
+    <style>
+        :root {
+            --accent: #E5E4E2;
+            --dark: #111;
+            --border: 2px solid #111;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 40px 20px;
+            color: var(--dark);
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* Navigation & Header */
+        .home-link {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        .family-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .top-bar { display: flex; gap: 15px; margin-bottom: 20px; }
+        #search {
+            flex: 1;
+            padding: 12px;
+            border: var(--border);
+            font-family: inherit;
+        }
+
+        /* Sorting Controls */
+        .sort-bar {
+            background: var(--accent);
+            padding: 10px;
+            border: var(--border);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            font-size: 0.8rem;
+            align-items: center;
+        }
+
+        .sort-bar button {
+            background: white; border: 1px solid var(--dark);
+            padding: 4px 12px; cursor: pointer; font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .sort-bar button:hover { background: #eee; }
+
+        /* Record Card Styling */
+        #petTableBody { display: flex; flex-direction: column; gap: 15px; }
+
+        .pet-record-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border: var(--border);
+            padding: 15px 25px;
+            transition: 0.2s;
+        }
+
+        .pet-record-row:hover { background: #fffdf5; box-shadow: 5px 5px 0px rgba(0,0,0,0.05); }
+
+        .info-group { display: flex; gap: 30px; flex: 1; }
+        .info-item strong {
+            display: block;
+            font-size: 0.65rem;
+            color: #777;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+        .info-item span { font-weight: 600; font-size: 0.95rem; }
+
+        /* Gallery Section */
+        .gallery-section {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: var(--border);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            border: var(--border);
+            background: white;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .gallery-item:hover { transform: translateY(-5px); }
+
+        .gallery-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            border-bottom: var(--border);
+            filter: grayscale(20%);
+        }
+
+        .gallery-item:hover .gallery-img { filter: grayscale(0%); }
+
+        .empty-image-slot {
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            color: #888;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border-bottom: var(--border);
+        }
+
+        .empty-image-slot::before { content: '+'; font-size: 2rem; margin-bottom: 5px; }
+
+        .gallery-name {
+            padding: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            background: var(--accent);
+            text-align: center;
+        }
+
+        /* Buttons */
+        .btn-primary { background: var(--dark); color: white; border: var(--border); padding: 10px 20px; cursor: pointer; font-weight: bold; }
+        .btn-warning { background: #ffcc00; border: 1px solid #111; cursor: pointer; padding: 6px 12px; font-weight: bold; }
+        .btn-danger { background: #ff4444; border: 1px solid #111; color: white; cursor: pointer; padding: 6px 12px; font-weight: bold; }
+        .image-input { display: none; }
+
+        .actions { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="/" class="home-link">← HOME</a>
+
+    <div class="family-header">
+        <h1>PET FAMILY</h1>
+        <a href="pet_form.html"><button class="btn-primary">ADD NEW RECORD</button></a>
+    </div>
+
+    <div class="top-bar">
+        <input type="text" id="search" placeholder="Search by name...">
+    </div>
+
+    <div class="sort-bar">
+        <strong>SORT BY:</strong>
+        <button id="sortBtnid">ID</button>
+        <button id="sortBtnName">Name</button>
+        <button id="sortBtnType">Type</button>
+        <button id="sortBtnPrice">Price</button>
+        <button id="sortBtnStatus">Status</button>
+        <button id="sortBtnVaccinated">Vaccinated</button>
+    </div>
+
+    <div id="petTableBody"></div>
+
+    <div class="gallery-section">
+        <h2>RECORDS SPOTLIGHT</h2>
+        <div id="petGallery" class="gallery-grid"></div>
+    </div>
+</div>
+
+<script>
+    let allPets = [];
+    let sortState = { field: 'petID', ascending: true };
+
+    async function loadPets() {
+        try {
+            const response = await fetch('/api/pets');
+            allPets = await response.json();
+            sortAndShow(allPets);
+        } catch (err) {
+            console.error("Error loading pets:", err);
+        }
+    }
+
+    async function getDiscountedPrice(petID) {
+        try {
+            const response = await fetch(`/api/pets/${petID}/getdiscountedprice`);
+            return await response.json();
+        } catch {
+            return 0;
+        }
+    }
+
+    async function showPets(pets) {
+        let html = '';
+        for (let pet of pets) {
+            const discountedPrice = await getDiscountedPrice(pet.petID);
+            html += `
+        <div class="pet-record-row">
+            <div class="info-group">
+                <div class="info-item"><strong>ID</strong><span>${pet.petID}</span></div>
+                <div class="info-item"><strong>Name</strong><span>${pet.petName}</span></div>
+                <div class="info-item"><strong>Type</strong><span>${pet.petType}</span></div>
+                <div class="info-item"><strong>Price</strong><span>$${pet.petPrice}</span></div>
+                <div class="info-item"><strong>Discount</strong><span>$${discountedPrice.toFixed(2)}</span></div>
+                <div class="info-item"><strong>Status</strong><span>${pet.petStatus}</span></div>
+            </div>
+            <div class="actions">
+                <a href="pet_form.html?id=${pet.petID}"><button class="btn-warning">Edit</button></a>
+                <button class="btn-danger" onclick="deletePet(${pet.petID})">Delete</button>
+            </div>
+        </div>`;
+        }
+        document.getElementById('petTableBody').innerHTML = html;
+        showGallery(pets);
+    }
+
+    function showGallery(pets) {
+        let galleryHtml = '';
+        const defaultImages = {
+            'dog': 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=300&q=80',
+            'cat': 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=300&q=80',
+            'bird': 'https://images.unsplash.com/photo-1522858547137-f1dcec554f55?auto=format&fit=crop&w=300&q=80',
+            'rabbit': 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=300&q=80',
+            'hamster': 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=300&q=80'
+        };
+
+        pets.forEach(pet => {
+            const savedImage = localStorage.getItem(`pet_image_${pet.petID}`);
+            let displayContent = '';
+            const typeKey = pet.petType.toLowerCase();
+
+            if (savedImage) {
+                displayContent = `<img src="${savedImage}" class="gallery-img">`;
+            } else if (pet.petID <= 5 && defaultImages[typeKey]) {
+                displayContent = `<img src="${defaultImages[typeKey]}" class="gallery-img">`;
+            } else {
+                displayContent = `<div class="empty-image-slot">Add Photo</div>`;
+            }
+
+            galleryHtml += `
+    <div class="gallery-item" onclick="document.getElementById('input-${pet.petID}').click()">
+        ${displayContent}
+        <div class="gallery-name">${pet.petName}</div>
+        <input type="file" id="input-${pet.petID}" class="image-input" accept="image/*" onchange="handleImageUpload(event, ${pet.petID})">
+    </div>`;
+        });
+        document.getElementById('petGallery').innerHTML = galleryHtml;
+    }
+
+    function handleImageUpload(event, petID) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                localStorage.setItem(`pet_image_${petID}`, e.target.result);
+                showGallery(allPets);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function sortPets(field) {
+        if (sortState.field === field) {
+            sortState.ascending = !sortState.ascending;
+        } else {
+            sortState.field = field;
+            sortState.ascending = true;
+        }
+        sortAndShow(allPets);
+    }
+
+    function sortAndShow(pets) {
+        pets.sort((a, b) => {
+            let aVal = a[sortState.field];
+            let bVal = b[sortState.field];
+
+            if (typeof aVal === 'string') {
+                aVal = aVal.toLowerCase();
+                bVal = bVal.toLowerCase();
+                return sortState.ascending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            } else {
+                return sortState.ascending ? aVal - bVal : bVal - aVal;
+            }
+        });
+        showPets(pets);
+    }
+
+    async function deletePet(id) {
+        if(confirm('Are you sure you want to delete this record?')) {
+            await fetch(`/api/pets/${id}`, {method: 'DELETE'});
+            loadPets();
+        }
+    }
+
+    // Event Listeners
+    document.getElementById('sortBtnid').addEventListener('click', () => sortPets('petID'));
+    document.getElementById('sortBtnName').addEventListener('click', () => sortPets('petName'));
+    document.getElementById('sortBtnType').addEventListener('click', () => sortPets('petType'));
+    document.getElementById('sortBtnPrice').addEventListener('click', () => sortPets('petPrice'));
+    document.getElementById('sortBtnStatus').addEventListener('click', () => sortPets('petStatus'));
+    document.getElementById('sortBtnVaccinated').addEventListener('click', () => sortPets('petVaccinated'));
+
+    document.getElementById('search').addEventListener('keyup', async (e) => {
+        const res = await fetch(`/api/pets/search/name?name=${e.target.value}`);
+        allPets = await res.json();
+        sortAndShow(allPets);
+    });
+
+    loadPets();
+</script>
+</body>
+</html>
