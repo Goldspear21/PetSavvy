@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-//bhargav - 412002531
+
 @Entity
 @Table(name = "pet", uniqueConstraints = {
 @UniqueConstraint(columnNames = {"PetName", "PetBirthdate","PetPrice","PetType", "PetStatus", "PetVaccinated"})

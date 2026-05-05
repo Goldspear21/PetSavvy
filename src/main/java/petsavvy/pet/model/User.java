@@ -3,8 +3,6 @@ package petsavvy.pet.model;
 import jakarta.persistence.*;
 
 
-// Jason
-// UID: 757001356
 
 @Entity
 @Table(name = "user")

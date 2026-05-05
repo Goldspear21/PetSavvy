@@ -3,7 +3,7 @@ package petsavvy.pet.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import java.time.LocalDate;
-// Name: Afnan Hasan, UID: 412002840
+
 @Entity
 @Table(name = "rescuedanimal")
 public class RescuedAnimals {
